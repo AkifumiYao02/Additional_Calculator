@@ -1,0 +1,446 @@
+// 小数点ボタンが押された時の処理
+    @IBAction func pointButtonTapped(_ sender: UIButton) {
+        if !pointButtonTapped {
+            str += sender.currentTitle!
+            if let v = Float(str){
+                firstValue = v
+            }
+            label.text = str
+            pointButtonTapped = true
+        }
+    }
+
+
+// ACボタンが押された処理
+    @IBAction func allClearButtonTapped(_ sender: UIButton) {
+        if allClearCancelState == 0{
+            currentOperator = .undefined
+        }
+        if allClearCancelState == 1{
+            ACButton.setTitle("AC", for: .normal)
+            allClearCancelState = 0
+        }
+        if currentOperator == .undefined
+        {
+            firstValue = 0
+            label.text = "0"
+        } else {
+            secondValue = 0
+            label.text = "0"
+        }
+        
+        pointButtonTapped = false
+        str = ""
+        opperatorLabel.text = ""
+        Fstr = " "
+        formulaLabel.text = Fstr
+        isEnter = false
+    }
+
+// デバイスの向きが変わった
+        notification.addObserver(self,
+                                selector: #selector(self.changeDeviceOrientation(_:)),
+                                name: UIDevice.orientationDidChangeNotification, object: nil
+        )
+
+// イベントで呼び出されるメソッド(回転)
+    @objc func changeDeviceOrientation(_ notification :Notification){
+        // デバイスを取得する
+        let device = UIDevice.current
+
+        // デバイスの向きを調べる
+        switch device.orientation {
+        case .portrait:   // ポートレート
+            self.SideModeStack0.isHidden = true
+            self.SideModeStack1.isHidden = true
+            self.SideModeStack2.isHidden = true
+        case .landscapeLeft:   // デバイスは左回転
+            self.SideModeStack0.isHidden = false
+            self.SideModeStack1.isHidden = false
+            self.SideModeStack2.isHidden = true
+        case .landscapeRight:   // デバイスは右回転
+            self.SideModeStack0.isHidden = true
+            self.SideModeStack1.isHidden = true
+            self.SideModeStack2.isHidden = false
+        default:
+            break
+        }
+    }
+
+// +/-ボタンが押された処理
+    @IBAction func changeSignButtonTapped(_ sender: UIButton) {
+        if currentOperator == .undefined {
+            firstValue *= -1
+            label.text = "\(firstValue)"
+        } else {
+            secondValue *= -1
+            label.text = "\(secondValue)"
+        }
+    }
+    
+    // %ボタンが押された処理
+    @IBAction func percentButtonTapped(_ sender: UIButton) {
+        if currentOperator == .undefined {
+            firstValue /= 100
+            label.text = "\(firstValue)"
+        } else {
+            secondValue /= 100
+            label.text = "\(secondValue)"
+        }
+    }
+    
+    // x^2の計算
+    @IBAction func squareButtonTapped(_ sender: UIButton) {
+        var value: Float = 0
+        if currentOperator == .undefined{
+            firstValue *= firstValue
+            value = firstValue
+        } else {
+            secondValue *= secondValue
+            value = secondValue
+        }
+        label.text = "\(value)"
+        str = ""
+    }
+    
+    // x^3の計算
+    @IBAction func cubeButtonTapped(_ sender: UIButton) {
+        var value: Float = 0
+        if currentOperator == .undefined{
+            firstValue = firstValue * firstValue * firstValue
+            value = firstValue
+        } else {
+            secondValue = secondValue * secondValue * secondValue
+            value = secondValue
+        }
+        label.text = "\(value)"
+        str = ""
+    }
+    
+    // eボタンを押した時の処理
+    @IBAction func eButtonTapped(_ sender: UIButton) {
+        var value: Float = 0
+        if currentOperator == .undefined{
+            firstValue = 2.718281828459045
+            value = firstValue
+        } else {
+            secondValue = 2.718281828459045
+            value = secondValue
+        }
+        label.text = "\(value)"
+        str = ""
+    }
+    
+    // πボタンを押した時の処理
+    @IBAction func piButtonTapped(_ sender: UIButton) {
+        var value: Float = 0
+        if currentOperator == .undefined{
+            firstValue = 3.141592653589793
+            value = firstValue
+        } else {
+            secondValue = 3.141592653589793
+            value = secondValue
+        }
+        label.text = "\(value)"
+        str = ""
+    }
+    
+    // taxボタンを押した時の処理
+    @IBAction func taxButtonTapped(_ sender: UIButton) {
+        var value: Float = 0
+        if currentOperator == .undefined{
+            firstValue *= 1.08
+            value = firstValue
+        } else {
+            secondValue *= 1.08
+            value = secondValue
+        }
+        label.text = "\(value)"
+        str = ""
+    }
+
+// sdボタンを押した時の色の切り替え
+    @IBOutlet weak var sdButton: UIButton!
+    @IBAction func soundButtonTapped(_ sender: UIButton) {
+        if soundFlg {
+            sdButton.backgroundColor = UIColor(red:64/255, green:64/255, blue:61/255, alpha:1.0)
+            sdButton.setTitleColor(UIColor.white, for: .normal)
+            soundFlg = false
+        } else {
+            sdButton.backgroundColor = UIColor(red:0.8, green:0.8, blue:0.8, alpha:1.0)
+            sdButton.setTitleColor(UIColor.black, for: .normal)
+            soundFlg = true
+        }
+    }
+    
+    @IBOutlet weak var fmButton: UIButton!
+    @IBAction func formulaButtonTapped(_ sender: Any) {
+        if formulaFlg {
+            fmButton.backgroundColor = UIColor(red:64/255, green:64/255, blue:61/255, alpha:1.0)
+            fmButton.setTitleColor(UIColor.white, for: .normal)
+            formulaFlg = false
+            formulaLabel.isHidden = true
+        } else {
+            fmButton.backgroundColor = UIColor(red:0.8, green:0.8, blue:0.8, alpha:1.0)
+            fmButton.setTitleColor(UIColor.black, for: .normal)
+            formulaFlg = true
+            formulaLabel.isHidden = false
+        }
+    }
+
+// mrボタンの処理
+    @IBOutlet weak var mrButton: UIButton!
+    @IBAction func memoryRecallButtonTapped(_ sender: Any) {
+        var value: Float = 0
+        switch memoryState {
+        case 1:
+            if currentOperator == .undefined{
+                firstValue = memoryPlus
+                value = firstValue
+            } else {
+                secondValue = memoryPlus
+                value = secondValue
+            }
+            label.text = "\(value)"
+        case 2:
+            if currentOperator == .undefined{
+                firstValue = memoryMinus
+                value = firstValue
+            } else {
+                secondValue = memoryMinus
+                value = secondValue
+            }
+            label.text = "\(value)"
+        default:
+            break
+        }
+    }
+    
+    // m-ボタンを押した時の処理
+    @IBAction func memoryMinusButtonTapped(_ sender: UIButton) {
+        if currentOperator == .undefined{
+            memoryMinus = firstValue * -1
+        } else {
+            memoryMinus = secondValue * -1
+        }
+        mrButton.setTitleColor(UIColor.black, for: .normal)
+        mrButton.backgroundColor = UIColor(red:0.8, green:0.8, blue:0.8, alpha:1.0)
+        memoryState = 2
+    }
+    
+    // m+ボタンを押した時の処理
+    @IBAction func memoryPlusButtonTapped(_ sender: UIButton) {
+            //var value: Float = 0
+            if currentOperator == .undefined{
+                memoryPlus = firstValue
+            } else {
+                memoryPlus = secondValue
+            }
+            mrButton.setTitleColor(UIColor.black, for: .normal)
+            mrButton.backgroundColor = UIColor(red:0.8, green:0.8, blue:0.8, alpha:1.0)
+            memoryState = 2
+            memoryState = 1
+    }
+    
+    // mcボタンを押した時の処理
+    @IBAction func memoryClearButtonTapped(_ sender: UIButton) {
+        mrButton.setTitleColor(UIColor.white, for: .normal)
+        mrButton.backgroundColor = UIColor(red:64/255, green:64/255, blue:61/255, alpha:1.0)
+        memoryPlus = 0
+        memoryMinus = 0
+        memoryState = 0
+    }
+
+// 演算子ボタンが押された処理
+    @IBAction func opperatorButtonTapped(_ sender: UIButton) {
+        // 既に演算子が押されていたら
+        if currentOperator != .undefined{
+            if isEnter{
+                Fstr.insert("(", at: Fstr.startIndex)
+                Fstr.removeLast()
+                Fstr += ")"
+            }
+            // ＝が押されていなかったら計算
+            if !isEnter{
+                Fstr.insert("(", at: Fstr.startIndex)
+                Fstr += ")"
+                Calculate()
+            }
+        }
+        switch sender.currentTitle! {
+        case "+":
+            currentOperator = .addition
+            opperatorLabel.text = "+"
+            Fstr += "+"
+        case "-":
+            currentOperator = .subtraction
+            opperatorLabel.text = "-"
+            Fstr += "-"
+        case "×":
+            currentOperator = .multiplication
+            opperatorLabel.text = "*"
+            Fstr += "*"
+        case "÷":
+            currentOperator = .division
+            opperatorLabel.text = "/"
+            Fstr += "/"
+        default:
+            currentOperator = .undefined
+        }
+        
+        str = ""
+        formulaLabel.text = Fstr
+        pointButtonTapped = false
+    }
+    
+    // 計算する処理
+    func Calculate(){
+        var value: Float = 0
+        switch currentOperator{
+            case .addition:
+                value = firstValue + secondValue
+            case .subtraction:
+                value = firstValue - secondValue
+            case .multiplication:
+                value = firstValue * secondValue
+            case .division:
+                value = firstValue / secondValue
+            case .undefined:
+                value = firstValue
+        }
+        
+        label.text = "\(value)"
+        opperatorLabel.text = ""
+        firstValue = value
+        pointButtonTapped = false
+    }
+    // イコールボタンが押された処理
+    @IBAction func equalButtonTapped(_ sender: UIButton) {
+        isEnter = true
+        Calculate()
+        Fstr += "="
+        formulaLabel.text = Fstr
+    }
+
+// 背景画像表示用の３つの変数
+        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        // このfileNameをUserDefaultsに保存して利用する
+        let fileURL = documentsURL.appendingPathComponent("Sample")
+        
+        let image:UIImage = getImageByUrl(url: fileURL)
+        backGroundView.image = image
+
+// 背景画像変更
+    @IBOutlet weak var backGroundView: UIImageView!{
+        didSet {
+            // デフォルトの画像を表示する
+            backGroundView.image = UIImage(named: "no_image.png")
+        }
+    }
+    
+    // URLからUIImageを取得する方法
+    func getImageByUrl(url: URL) -> UIImage{
+        
+        do {
+            let data = try Data(contentsOf: url)
+            return UIImage(data: data)!
+        } catch let err {
+            print("Error : \(err.localizedDescription)")
+        }
+        return UIImage()
+    }
+    
+    @IBAction func BackBroundButtonTapped(_ sender: UIButton) {
+        // カメラロールが利用可能か？
+        if UIImagePickerController.isSourceTypeAvailable(.photoLibrary) {
+            // 写真を選ぶビュー
+            let pickerView = UIImagePickerController()
+            // 写真の選択元をカメラロールにする
+            // 「.camera」にすればカメラを起動できる
+            pickerView.sourceType = .photoLibrary
+            // デリゲート
+            pickerView.delegate = self
+            // ビューに表示
+            self.present(pickerView, animated: true)
+        }
+    }
+    
+    @IBAction func resetBackGroundButtonTapped(_ sender: UIButton) {
+        // アラート表示
+        showAlert()
+    }
+    
+    /// アラート表示
+    func showAlert() {
+        let alert = UIAlertController(title: "確認",
+                                      message: "背景をリセットしてもいいですか？",
+                                      preferredStyle: .alert)
+        let okButton = UIAlertAction(title: "OK",
+                                     style: .default,
+                                     handler:{(action: UIAlertAction) -> Void in
+                                        // デフォルトの画像を表示する
+                                        self.backGroundView.image = UIImage(named: "no_image.png")
+        })
+        let cancelButton = UIAlertAction(title: "キャンセル", style: .cancel, handler: nil)
+        
+        // アラートにボタン追加
+        alert.addAction(okButton)
+        alert.addAction(cancelButton)
+        
+        // アラート表示
+        present(alert, animated: true, completion: nil)
+    }
+}
+
+extension ViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    // 写真を選んだ後に呼ばれる処理
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        // 選択した写真を取得する
+        let image = info[.originalImage] as! UIImage
+        // ビューに表示する
+        backGroundView.image = image
+        // 写真を選ぶビューを引っ込める
+        self.dismiss(animated: true)
+        
+        
+        let fileName = "Sample"
+        
+        saveImageToDocumentsDirectory(image: image, name: fileName)
+        
+        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        
+        // このfileNameをUserDefaultsに保存して利用する
+        let fileURL = documentsURL.appendingPathComponent(fileName)
+    }
+    
+    
+    // ファイルを保存するURLを返す
+    func getDocumentsDirectory() -> URL {
+        let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+        let documentsDirectory = paths[0]
+        return documentsDirectory
+    }
+    
+    // ファイルに画像を保存する
+    func saveImageToDocumentsDirectory(image: UIImage, name: String) {
+        if let data = image.pngData() {
+            let filename = getDocumentsDirectory().appendingPathComponent(name)
+            try? data.write(to: filename)
+        }
+    }
+
+// fmボタンが押された時の処理
+    @IBOutlet weak var fmButton: UIButton!
+    @IBAction func formulaButtonTapped(_ sender: Any) {
+        if formulaFlg {
+            fmButton.backgroundColor = UIColor(red:64/255, green:64/255, blue:61/255, alpha:1.0)
+            fmButton.setTitleColor(UIColor.white, for: .normal)
+            formulaFlg = false
+            formulaLabel.isHidden = true
+        } else {
+            fmButton.backgroundColor = UIColor(red:0.8, green:0.8, blue:0.8, alpha:1.0)
+            fmButton.setTitleColor(UIColor.black, for: .normal)
+            formulaFlg = true
+            formulaLabel.isHidden = false
+        }
+    }
